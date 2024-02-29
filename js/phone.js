@@ -1,4 +1,4 @@
-const loadPhone = async (searchText, isShowAll) => {
+const loadPhone = async (searchText='13', isShowAll) => {
   const res = await fetch(`https://openapi.programming-hero.com/api/phones?search=${searchText}`)
   const data = await res.json();
   const phones = data.data
@@ -19,7 +19,7 @@ const displayPhones = (phones, isShowAll) => {
   }
   if (!isShowAll) {
     phones = phones.slice(0, 12)
- }
+  }
   phones.forEach(phone => {
     // console.log(phone)
     const phoneCard = document.createElement('div')
@@ -32,13 +32,35 @@ const displayPhones = (phones, isShowAll) => {
         <h2 class="card-title">${phone.phone_name}</h2>
         <p>${phone.brand}</p>
         <div class="card-actions">
-          <button class="btn btn-primary">Buy Now</button>
+          <button onclick="handleShowDetails('${phone.slug}')" class="btn btn-primary">SHOW DETAILS</button>
         </div>
       </div>
         `
     phoneContainer.appendChild(phoneCard)
   });
   toggleLoadingSpinner(false);
+}
+
+const handleShowDetails = async (id) => {
+  // load single data 
+  const res = await fetch(`https://openapi.programming-hero.com/api/phone/${id}`)
+  const data = await res.json()
+  const phone = data.data;
+  showPhoneDetails(data)
+}
+
+const showPhoneDetails = (phone) => {
+  console.log(phone)
+  const phoneName = document.getElementById('phone-name')
+  phoneName.innerText = phone.data.name;
+  const showDetails = document.getElementById('show-details')
+  showDetails.innerHTML = `
+  <img src="${phone.data.image}" alt"=""/>
+  <p>${phone.data.slug}</p>
+  `
+
+  // show the modal 
+  my_modal_5.showModal();
 }
 
 const handleSearch = (isShowAll) => {
@@ -62,3 +84,5 @@ const toggleLoadingSpinner = (isLoading) => {
 const handleShowAll = () => {
   handleSearch(true);
 }
+
+loadPhone()
